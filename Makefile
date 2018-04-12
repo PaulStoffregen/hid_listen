@@ -1,8 +1,8 @@
 PROG = hid_listen
 
-OS = LINUX
-#OS = DARWIN
-#OS = WINDOWS
+# Target OS (default Linux):
+# LINUX / DARWIN / WINDOWS
+OS ?= LINUX
 
 
 ifeq ($(OS), LINUX)
