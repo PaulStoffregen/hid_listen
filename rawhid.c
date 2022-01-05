@@ -46,11 +46,11 @@
 
 /*************************************************************************/
 /**                                                                     **/
-/**                             Linux                                   **/
+/**                             Linux / FreeBSD                         **/
 /**                                                                     **/
 /*************************************************************************/
 
-#if defined(LINUX) || defined(__LINUX__)
+#if defined(LINUX) || defined(__LINUX__) || defined(FREEBSD) || defined(__FreeBSD__)
 #define OPERATING_SYSTEM linux
 #include <fcntl.h>
 #include <errno.h>
@@ -58,7 +58,16 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#ifdef __FreeBSD__
+// You need to load hidraw(4) first, put the following in /boot/loader.conf:
+// hw.usb.usbhid.enable=1
+// usbhid_load="YES"
+// hidraw_load="YES"
+#include <dev/hid/hidraw.h>
+#define HIDRAW_MAX_DEVICES 0xff  // arbitrary value
+#else
 #include <linux/hidraw.h>
+#endif
 
 
 struct rawhid_struct {
@@ -234,7 +243,7 @@ void rawhid_list_close(rawhid_list_t *list)
 #endif
 
 
-#endif // linux
+#endif // linux / FreeBSD
 
 
 /*************************************************************************/
