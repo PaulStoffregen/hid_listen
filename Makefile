@@ -1,20 +1,21 @@
 PROG = hid_listen
 
 # Target OS (default Linux):
-# LINUX / DARWIN / WINDOWS
+# LINUX / FREEBSD / DARWIN / WINDOWS
 OS ?= LINUX
 
+# Defaults
+TARGET ?= $(PROG)
+CC ?= cc
+CFLAGS ?= -O2 -Wall -D$(OS)
+STRIP ?= strip
+LIBS ?=
 
+# Potential per-OS overrides
 ifeq ($(OS), LINUX)
-TARGET = $(PROG)
-CC = gcc
-STRIP = strip
-CFLAGS = -O2 -Wall -D$(OS)
-LIBS =
+else ifeq ($(OS), FREEBSD)
 else ifeq ($(OS), DARWIN)
-TARGET = $(PROG)
 CC = gcc
-STRIP = strip
 CFLAGS = -O2 -Wall -D$(OS) -arch x86_64
 LIBS = -framework IOKit -framework CoreFoundation
 else ifeq ($(OS), WINDOWS)
@@ -22,7 +23,6 @@ TARGET = $(PROG).exe
 CC = i586-mingw32msvc-gcc
 STRIP = i586-mingw32msvc-strip
 WINDRES = i586-mingw32msvc-windres
-CFLAGS =  -O2 -Wall -D$(OS)
 LIBS = -lhid -lsetupapi
 KEY_SPC = ~/bin/cert/mykey.spc
 KEY_PVK = ~/bin/cert/mykey.pvk
@@ -36,7 +36,7 @@ OBJS = hid_listen.o rawhid.o
 all: $(TARGET)
 
 $(PROG): $(OBJS)
-	gcc -o $(PROG) $(OBJS) $(LIBS)
+	$(CC) -o $(PROG) $(OBJS) $(LIBS)
 	$(STRIP) $(PROG)
 
 $(PROG).app: $(PROG) Info.plist
@@ -58,8 +58,6 @@ $(PROG).exe: $(OBJS)
 
 resource.o: resource.rs icons/$(PROG).ico
 	$(WINDRES) -o resource.o resource.rs
-
-
 
 clean:
 	rm -f *.o $(PROG) $(PROG).exe $(PROG).exe.bak $(PROG).dmg
