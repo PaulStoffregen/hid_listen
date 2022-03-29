@@ -16,7 +16,11 @@ ifeq ($(OS), LINUX)
 else ifeq ($(OS), FREEBSD)
 else ifeq ($(OS), DARWIN)
 CC = gcc
-CFLAGS = -O2 -Wall -D$(OS) -arch x86_64
+ifeq ($(shell uname -m),arm64)
+	CFLAGS += -arch arm64
+else
+	CFLAGS += -arch x86_64
+endif
 LIBS = -framework IOKit -framework CoreFoundation
 else ifeq ($(OS), WINDOWS)
 TARGET = $(PROG).exe
